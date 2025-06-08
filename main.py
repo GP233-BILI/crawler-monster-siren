@@ -31,7 +31,13 @@ class MonsterSiren:
             headers=self.headers
         )
         song_data = json.loads(response.text)['data']
-        return song_data
+        if "Instrumental" in song_data["name"]:
+            print("该歌曲为伴奏，跳过下载")
+            song_data = {}
+            return song_data
+        else:
+            return song_data
+        
 
     def __get_album_info(self):
         for albumInfo in self.__get_album_list():
@@ -43,6 +49,8 @@ class MonsterSiren:
             song_list = []
             for song_info in albumData['songs']:
                 song_data = self.__get_song_data(song_info['cid'])
+                if len(song_data) == 0:
+                    break
                 song_temp = {
                     'artists': song_data['artists'],
                     'lyricUrl': song_data['lyricUrl'],
@@ -70,7 +78,7 @@ class MonsterSiren:
 
         def url_download(url, headers, name, path):
             if os.path.isfile(f'{path}/{name}'):
-                # print(f'{name}已存在')
+                print(f'{name}已存在')
                 return
             else:
                 # print(f'正在下载{name}')
